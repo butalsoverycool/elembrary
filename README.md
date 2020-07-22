@@ -10,9 +10,7 @@
 
 -  build more components
 
----
-
-**\*** :) **\***
+that's that
 
 ---
 
