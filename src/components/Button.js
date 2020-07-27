@@ -1,99 +1,96 @@
-import React from 'react';
-import styled, { css, ThemeProvider } from 'styled-components';
-import theme, { themeHandler } from '../constants/theme';
-import { typeCheck, selectorAlias } from '../constants/helperFuncs';
-import * as preset from '../constants/preset';
+import React from "react";
+import styled, { css } from "styled-components";
+import { selectorAlias } from "../constants/helperFuncs";
+import * as preset from "../constants/preset";
 
 const ButtonStyled = styled.button`
     /* DEFAULT PROPS */
     
-    ${(p) => p.default}
+    ${p => p.default}
     
     transition: ${({ theme, transition }) =>
-			!transition
-				? theme.transition.fast
-				: preset.transition.includes(transition)
-				? theme.transition[transition]
-				: transition};
+      !transition
+        ? theme.transition.fast
+        : preset.transition.includes(transition)
+        ? theme.transition[transition]
+        : transition};
 
 	&:hover {
-        color: ${({ inverted, mode, theme }) =>
-				mode
-					? theme.mode({ mode, color: 'secondaryStrong', inverted })
-					: themeHandler({ color: 'primaryStrong', inverted })};
-        
-        background: ${({ inverted, mode, theme }) =>
-				mode
-					? theme.mode({ mode, color: 'primaryStrong', inverted })
-					: themeHandler({ color: 'secondaryStrong', inverted })};
+        ${({ inverted, mode, themeHandler }) => {
+          let color = "secondaryStrong";
+
+          if (mode) color = "primaryStrong";
+
+          return `
+                color: ${themeHandler({
+                  mode,
+                  colorType: "primaryStrong",
+                  inverted,
+                })};
+                background: ${themeHandler({
+                  mode,
+                  colorType: "secondaryStrong",
+                  inverted,
+                })};
+            `;
+        }}
 	}
 
     /* OPTIONAL PROPS */
 
-    ${({ mode, color, bg, border, shadow, inverted, theme }) => {
-			// color
-			const pickColor = () => {
-				if (color) return color;
+    ${({ mode, color, bg, border, shadow, inverted, theme, themeHandler }) => {
+      // color
+      const pickColor = () => {
+        if (color) return color;
 
-				if (mode) return theme.mode({ mode, color: 'secondary', inverted });
+        return themeHandler({ mode, colorType: "primary", inverted });
+      };
 
-				return themeHandler({ color: 'primary', inverted });
-			};
+      // bg
+      const pickBg = () => {
+        if (bg) return bg;
 
-			// bg
-			const pickBg = () => {
-				if (bg) return bg;
+        return themeHandler({ mode, colorType: "secondary", inverted });
+      };
 
-				if (mode) return theme.mode({ mode, color: 'primary', inverted });
+      // border
+      const pickBorder = () => {
+        if (!border) return null;
 
-				return themeHandler({ color: 'secondary', inverted });
-			};
+        const { color, size, type } = theme.border;
 
-			// border
-			const pickBorder = () => {
-				if (typeof border === 'string') {
-					if (border.indexOf(' ') >= 0) return border;
-					else
-						return `${border} ${theme.border.size} ${theme.border.type}`;
-				}
+        if (typeof border === "string") {
+          if (border.indexOf(" ") >= 0) return border;
+          else return `${border} ${size} ${type}`;
+        } else {
+          return `${color({ mode, inverted })} ${size} ${type}`;
+        }
+      };
 
-				if (mode) return theme.mode({ mode, color: 'secondary', inverted });
+      // shadow
+      const pickShadow = () => {
+        if (typeof shadow === "string") {
+          if (shadow.indexOf(" ") >= 0) return shadow;
 
-				if (border)
-					return (
-						themeHandler({
-							color: 'primary',
-							inverted,
-						}) + ' solid 2px'
-					);
-			};
+          return theme.shadow[shadow];
+        }
 
-			// shadow
-			const pickShadow = () => {
-				if (typeof shadow === 'string') {
-					if (shadow.indexOf(' ') >= 0) return shadow;
+        if (shadow) return theme.shadow.medium;
+      };
 
-					return theme.shadow[shadow];
-				}
-
-				if (shadow) return theme.shadow.medium;
-			};
-
-			return `
+      return `
             color: ${pickColor()};
             background: ${pickBg()};
             border: ${pickBorder()};
             box-shadow: ${pickShadow()};
         `;
-		}}
+    }}
     
-	
     ${({ size, theme }) => size && `font-size: ${theme[size]};`}
 
-
     ${({ unmarkable }) =>
-			unmarkable &&
-			`
+      unmarkable &&
+      `
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
@@ -105,29 +102,28 @@ const ButtonStyled = styled.button`
     /* CUSTOM STYLE */
 
     ${({ hoverStyle }) =>
-			hoverStyle &&
-			css`
-				&:hover {
-					${hoverStyle}
-				}
-			`}
-    
+      hoverStyle &&
+      css`
+        &:hover {
+          ${hoverStyle}
+        }
+      `}
     
     ${({ customStyle }) => css`
-			${customStyle}
-		`};
+      ${customStyle}
+    `};
 `;
 
 ButtonStyled.defaultProps = {
-	default: {
-		fontSize: '1rem',
-		margin: '10px',
-		padding: '5px 10px',
-		border: 'none',
-		borderRadius: '4px',
-		cursor: 'pointer',
-		outline: 'none',
-	},
+  default: {
+    fontSize: "1rem",
+    margin: "10px",
+    padding: "5px 10px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    outline: "none",
+  },
 };
 
 /* 
@@ -152,24 +148,22 @@ transition = 'fast' (string, options: either keyword none/fast/medium/slow or cu
 */
 
 const Button = ({
-	id = '',
-	className = '',
-	text = '',
-	unmarkable = true,
-	...props
+  id = "",
+  className = "",
+  text = "",
+  unmarkable = true,
+  ...props
 }) => {
-	return (
-		<ThemeProvider theme={theme}>
-			<ButtonStyled
-				id={selectorAlias(id).replace(/ /g, '-')}
-				className={selectorAlias(className)}
-				unmarkable={unmarkable}
-				{...props}
-			>
-				{String(text)}
-			</ButtonStyled>
-		</ThemeProvider>
-	);
+  return (
+    <ButtonStyled
+      id={selectorAlias(id).replace(/ /g, "-")}
+      className={selectorAlias(className)}
+      unmarkable={unmarkable}
+      {...props}
+    >
+      {String(text)}
+    </ButtonStyled>
+  );
 };
 
 export default Button;

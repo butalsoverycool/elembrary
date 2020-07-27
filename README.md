@@ -1,19 +1,20 @@
 # Elembrary
 
-###### a react library of reusable components
+###### simple and fully customizable html-components
 
 ### DEPENDENCIES
 
--  styled components
+- styled components
 
 ### ELEMS
 
--  Button
--  ...
+- Button
+- Text
+- Flex
 
 ### TODO
 
--  build more components
+- build more components
 
 ---
 
